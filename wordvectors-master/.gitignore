@@ -1,0 +1,5 @@
+data/
+*.pyc
+_*
+
+wordvectors-master/data/viwiki-None-pages-articles-multistream.xml
