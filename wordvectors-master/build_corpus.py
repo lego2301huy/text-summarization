@@ -40,7 +40,7 @@ elif lcode == 'th':
 #     print "StanfordSegmenter succesfuly loaded!"
     
 max_corpus_size = args.max_corpus_size
-fname = "viwiki-None-pages-articles-multistream.xml".format(lcode)    
+fname = "viwiki-{}-pages-articles-multistream.xml".format(lcode)    
 
 def clean_text(text):
     global lcode

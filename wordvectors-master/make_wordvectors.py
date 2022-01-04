@@ -44,7 +44,8 @@ def make_wordvectors():
      
     print ("Making sentences as list...")
     sents = []
-    with codecs.open('data/{}.txt'.format(lcode), 'r', 'utf-8') as fin:
+    with codecs.open('data/NewSplitFile-1.txt', 'r', 'utf-8') as fin:
+    #with codecs.open('data/{}.txt'.format(lcode), 'r', 'utf-8') as fin:
         while 1:
             line = fin.readline()
             if not line: break
@@ -59,7 +60,7 @@ def make_wordvectors():
                                    window=window_size)
     
     # model.save('data/{}.bin'.format(lcode))
-    model.wv.save_word2vec_format('data/{}1.vec'.format(lcode), binary=False)
+    model.wv.save_word2vec_format('data/{}-{}-{}-{}-{}-fullsplit.vec'.format(lcode, vector_size, window_size, vocab_size, num_negative), binary=False)
     
     # Save to file
     # with codecs.open('data/{}.vec'.format(lcode), 'w', 'utf-8') as fout:
@@ -68,7 +69,7 @@ def make_wordvectors():
     #                                           np.array_str(model[word])[1:-1]
     #                                           ))
 
-    with codecs.open('data/{}1.tsv'.format(lcode), 'w', 'utf-8') as fout:
+    with codecs.open('data/{}-{}-{}-{}-{}-fullsplit.tsv'.format(lcode, vector_size, window_size, vocab_size, num_negative), 'w', 'utf-8') as fout:
         for i, word in enumerate(model.wv.index2word):
             fout.write(u"{}{}\n".format(word.encode('utf8').decode('utf8'),
                                               np.array_str(model[word])[1:-1]
