@@ -1,2 +1,4 @@
 corpus/
 wordvectors-master/data/Vectors/
+*.tsv
+*.vec

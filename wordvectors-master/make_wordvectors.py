@@ -44,7 +44,7 @@ def make_wordvectors():
      
     print ("Making sentences as list...")
     sents = []
-    with codecs.open('data/NewSplitFile-1.txt', 'r', 'utf-8') as fin:
+    with codecs.open('data/corpus-split-1.txt', 'r', 'utf-8') as fin:
     #with codecs.open('data/{}.txt'.format(lcode), 'r', 'utf-8') as fin:
         while 1:
             line = fin.readline()
