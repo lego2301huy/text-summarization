@@ -5,6 +5,9 @@ import os
 import codecs
 import argparse
 import numpy as np
+import gensim # In case you have difficulties installing gensim, you need to consider installing conda.
+from gensim.models.callbacks import CallbackAny2Vec
+import pickle as pickle
 
 # arguments setting 
 parser = argparse.ArgumentParser()
@@ -20,6 +23,23 @@ vector_size = args.vector_size
 window_size = args.window_size
 vocab_size = args.vocab_size
 num_negative = args.num_negative
+epochs = 5
+
+class callback(CallbackAny2Vec):
+    '''Callback to print loss after each epoch.'''
+
+    def __init__(self):
+        self.epoch = 0
+        self.loss_to_be_subed = 0
+        self.losses = []
+
+    def on_epoch_end(self, model):
+        loss = model.get_latest_training_loss()
+        loss_now = loss - self.loss_to_be_subed
+        self.loss_to_be_subed = loss
+        print('Loss after epoch {}: {}'.format(self.epoch, loss_now))
+        self.epoch += 1
+        self.losses.append(loss_now)
 
 def get_min_count(sents):
     '''
@@ -39,12 +59,11 @@ def get_min_count(sents):
 
 def make_wordvectors():
     global lcode
-    import gensim # In case you have difficulties installing gensim, you need to consider installing conda.
-    import pickle as pickle
+    
      
     print ("Making sentences as list...")
     sents = []
-    with codecs.open('data/corpus/corpus-split/corpus-split-2.txt', 'r', 'utf-8') as fin:
+    with codecs.open('data/corpus/vi-wiki.txt', 'r', 'utf-8') as fin:
     #with codecs.open('data/{}.txt'.format(lcode), 'r', 'utf-8') as fin:
         while 1:
             line = fin.readline()
@@ -55,12 +74,17 @@ def make_wordvectors():
 
     print ("Making word vectors...")   
     min_count = get_min_count(sents)
+
+    call_back = callback()
     model = gensim.models.Word2Vec(sents, size=vector_size, min_count=min_count,
                                    negative=num_negative, 
-                                   window=window_size)
+                                   window=window_size,
+                                   callbacks=[call_back],
+                                   compute_loss=True,
+                                   iter=epochs)
     
     # model.save('data/{}.bin'.format(lcode))
-    model.wv.save_word2vec_format('data/vectors/{}-{}-{}-{}-{}-fullsplit.vec'.format(lcode, vector_size, window_size, vocab_size, num_negative), binary=False)
+    model.wv.save_word2vec_format('data/vectors/{}-{}-{}-{}-{}-wiki.vec'.format(lcode, vector_size, window_size, vocab_size, num_negative), binary=False)
     
     # Save to file
     # with codecs.open('data/{}.vec'.format(lcode), 'w', 'utf-8') as fout:
@@ -69,7 +93,7 @@ def make_wordvectors():
     #                                           np.array_str(model[word])[1:-1]
     #                                           ))
 
-    with codecs.open('data/vectors/{}-{}-{}-{}-{}-fullsplit.tsv'.format(lcode, vector_size, window_size, vocab_size, num_negative), 'w', 'utf-8') as fout:
+    with codecs.open('data/vectors/{}-{}-{}-{}-{}-wiki.tsv'.format(lcode, vector_size, window_size, vocab_size, num_negative), 'w', 'utf-8') as fout:
         for i, word in enumerate(model.wv.index2word):
             fout.write(u"{}{}\n".format(word.encode('utf8').decode('utf8'),
                                               np.array_str(model[word])[1:-1]
